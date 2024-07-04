@@ -55,7 +55,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                 DropdownButtonFormField<String>(
                   validator: (value) {
                     if (value == null) {
-                      return 'Please select a language';
+                      return 'Please select a target language';
                     }
                     return null;
                   },
@@ -73,7 +73,7 @@ class _CreateUserPageState extends State<CreateUserPage> {
                     });
                   },
                   decoration: InputDecoration(
-                    labelText: 'Select a language',
+                    labelText: 'Select a Target Language',
                     border: OutlineInputBorder(),
                   ),
                 ),

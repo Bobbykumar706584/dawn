@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:obs_demo/editortext.dart';
+import 'package:obs_demo/screen/audio.dart';
 import 'package:obs_demo/screen/dashboard.dart';
 import 'package:obs_demo/user_profile.dart';
 
@@ -46,11 +47,11 @@ class _BottomNavigationBarExampleState
           ),
           SizedBox(height: 20),
           Text(
-            '${userProfile.userName}',
+            'Username : ${userProfile.userName}',
             style: optionStyle,
           ),
           Text(
-            '${userProfile.language ?? 'None'}',
+            'Target Language : ${userProfile.language ?? 'None'}',
             style: optionStyle,
           ),
         ],
@@ -60,6 +61,7 @@ class _BottomNavigationBarExampleState
         rowIndex: 0,
         onUpdateTextAvailability: onUpdateTextAvailability,
       ),
+      AudioRecorder(),
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -120,6 +122,10 @@ class _BottomNavigationBarExampleState
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.create),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.spatial_audio_off),
             label: '',
           ),
           BottomNavigationBarItem(
