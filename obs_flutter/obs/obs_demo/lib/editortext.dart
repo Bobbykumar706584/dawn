@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:obs_demo/screen/audio.dart'; // Assuming this contains AudioRecorder
 
 class EditorTextLayout extends StatefulWidget {
   const EditorTextLayout({
@@ -62,18 +63,18 @@ class _EditorTextLayoutState extends State<EditorTextLayout> {
   Future<Map<String, dynamic>> readJsonToFile() async {
     final directory = await getApplicationDocumentsDirectory();
     final file = File('${directory.path}/${storyIndex}.json');
-    // Replace with your desired filename
+
     try {
       final jsonData = await file.readAsString();
       final data = jsonDecode(jsonData) as Map<String, dynamic>;
-      _controller.text = data['story'][0]['text'];
-      data['story'][0]['isEmpty'] = false;
+      _controller.text = data['story'][paraIndex]['text'];
+      data['story'][paraIndex]['isEmpty'] = false;
       return data;
     } on FileSystemException {
       return <String, dynamic>{};
     } catch (e) {
       print("Error reading JSON file: $e");
-      rethrow;
+      return <String, dynamic>{};
     }
   }
 
@@ -89,8 +90,7 @@ class _EditorTextLayoutState extends State<EditorTextLayout> {
 
   @override
   void dispose() {
-    // TODO: implement dispose
-    _focusNode.dispose();
+    _focusNode.dispose(); // Dispose of the FocusNode properly
     super.dispose();
   }
 
@@ -243,62 +243,40 @@ class _EditorTextLayoutState extends State<EditorTextLayout> {
                           decoration: BoxDecoration(
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey
-                                    .withOpacity(0.5), // Shadow color
+                                color: Colors.grey.withOpacity(0.5),
                                 spreadRadius: 1,
                                 blurRadius: 7,
-                                offset:
-                                    Offset(0, 3), // Changes position of shadow
+                                offset: Offset(0, 3),
                               ),
                             ],
-                            color: Colors
-                                .white, // Background color for the text field
-                            borderRadius:
-                                BorderRadius.circular(5), // Rounded corners
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5),
                           ),
-                          child: Theme(
-                            data: Theme.of(context).copyWith(
-                              textSelectionTheme: TextSelectionThemeData(
-                                selectionColor:
-                                    Colors.grey, // Color of the selected text
-                                cursorColor: Colors
-                                    .grey, // Color of the caret (text cursor)
-                                selectionHandleColor: Colors
-                                    .grey, // Color of the selection handles
-                              ),
+                          child: TextField(
+                            controller: _controller,
+                            focusNode: _focusNode,
+                            onChanged: (value) {
+                              setState(() {
+                                _textFieldValue = value;
+                              });
+                              saveData(_textFieldValue);
+                            },
+                            decoration: InputDecoration(
+                              labelText: (_focusNode.hasFocus ||
+                                      _textFieldValue.isNotEmpty)
+                                  ? null
+                                  : 'Start translating story',
+                              labelStyle: TextStyle(color: Colors.grey),
+                              errorText: _errorMessage.isNotEmpty
+                                  ? _errorMessage
+                                  : null,
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                              border: InputBorder.none,
+                              contentPadding: EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 10.0),
                             ),
-                            child: TextField(
-                              controller: _controller,
-                              focusNode: _focusNode,
-                              onChanged: (value) {
-                                setState(() {
-                                  _textFieldValue = value;
-                                });
-                                saveData(_textFieldValue);
-                              },
-                              decoration: InputDecoration(
-                                labelText: (_focusNode.hasFocus ||
-                                        _textFieldValue.isNotEmpty)
-                                    ? null
-                                    : 'Start translating story',
-                                labelStyle: TextStyle(
-                                    color: Colors
-                                        .grey), // Optional: changes label color to grey
-                                errorText: _errorMessage.isNotEmpty
-                                    ? _errorMessage
-                                    : null,
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                                border: InputBorder
-                                    .none, // Removes the default border
-                                contentPadding: EdgeInsets.symmetric(
-                                    vertical: 10.0,
-                                    horizontal:
-                                        10.0), // Adjust padding as needed
-                              ),
-                              maxLines:
-                                  30, // Increases the height to accommodate up to 30 lines
-                            ),
+                            maxLines: 25,
                           ),
                         ),
                       ),
