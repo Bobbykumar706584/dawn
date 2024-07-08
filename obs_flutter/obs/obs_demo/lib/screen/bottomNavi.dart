@@ -61,7 +61,6 @@ class _BottomNavigationBarExampleState
         rowIndex: 0,
         onUpdateTextAvailability: onUpdateTextAvailability,
       ),
-      AudioRecorder(),
       Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
@@ -122,10 +121,6 @@ class _BottomNavigationBarExampleState
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.create),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.spatial_audio_off),
             label: '',
           ),
           BottomNavigationBarItem(

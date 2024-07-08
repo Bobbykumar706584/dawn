@@ -1,12 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
 
 class PlayerWidget extends StatefulWidget {
   final AudioPlayer player;
+  final String? filePath;
 
   const PlayerWidget({
     required this.player,
+    required this.filePath,
     Key? key,
   }) : super(key: key);
 
@@ -23,6 +26,8 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerCompleteSubscription;
   StreamSubscription? _playerStateChangeSubscription;
+
+  List<double>? _samples;
 
   bool get _isPlaying => _playerState == PlayerState.playing;
 
@@ -73,22 +78,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Slider(
-          onChanged: (value) {
-            final duration = _duration;
-            if (duration == null) {
-              return;
-            }
-            final position = value * duration.inMilliseconds;
-            player.seek(Duration(milliseconds: position.round()));
-          },
-          value: (_position != null &&
-                  _duration != null &&
-                  _position!.inMilliseconds > 0 &&
-                  _position!.inMilliseconds < _duration!.inMilliseconds)
-              ? _position!.inMilliseconds / _duration!.inMilliseconds
-              : 0.0,
-        ),
+        if (_duration != null && _duration!.inMilliseconds > 0)
+          PolygonWaveform(
+            maxDuration: _duration ?? Duration.zero,
+            elapsedDuration: _position ?? Duration.zero,
+            samples:
+                _samples ?? [], // Use _samples if available, else empty list
+            height: 300,
+            width: MediaQuery.of(context).size.width,
+          )
+        else
+          Container(
+            height: 100,
+            color: Colors.grey.withOpacity(0.3),
+            alignment: Alignment.center,
+            child: Text(
+              'Loading waveform...$_samples, $_duration', // Placeholder or loading indicator
+              style: TextStyle(fontSize: 16.0),
+            ),
+          ),
         Text(
           _position != null
               ? '$_positionText / $_durationText'
@@ -97,32 +105,24 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   : '',
           style: const TextStyle(fontSize: 16.0),
         ),
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              key: const Key('play_button'),
-              onPressed: _isPlaying ? null : _play,
-              iconSize: 48.0,
-              icon: const Icon(Icons.play_arrow),
-              color: color,
-            ),
-            IconButton(
-              key: const Key('pause_button'),
-              onPressed: _isPlaying ? _pause : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.pause),
-              color: color,
-            ),
-            IconButton(
-              key: const Key('stop_button'),
-              onPressed: _isPlaying || _isPaused ? _stop : null,
-              iconSize: 48.0,
-              icon: const Icon(Icons.stop),
-              color: color,
-            ),
-          ],
-        ),
+        // SizedBox(height: 16),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: <Widget>[
+        //     IconButton(
+        //       icon: Icon(Icons.play_arrow),
+        //       onPressed: _isPlaying ? null : _play,
+        //     ),
+        //     IconButton(
+        //       icon: Icon(Icons.pause),
+        //       onPressed: _isPlaying ? _pause : null,
+        //     ),
+        //     IconButton(
+        //       icon: Icon(Icons.stop),
+        //       onPressed: _stop,
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -151,21 +151,21 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
-  Future<void> _play() async {
-    await player.resume();
-    setState(() => _playerState = PlayerState.playing);
-  }
+  // Future<void> _play() async {
+  //   await player.resume();
+  //   setState(() => _playerState = PlayerState.playing);
+  // }
 
-  Future<void> _pause() async {
-    await player.pause();
-    setState(() => _playerState = PlayerState.paused);
-  }
+  // Future<void> _pause() async {
+  //   await player.pause();
+  //   setState(() => _playerState = PlayerState.paused);
+  // }
 
-  Future<void> _stop() async {
-    await player.stop();
-    setState(() {
-      _playerState = PlayerState.stopped;
-      _position = Duration.zero;
-    });
-  }
+  // Future<void> _stop() async {
+  //   await player.stop();
+  //   setState(() {
+  //     _playerState = PlayerState.stopped;
+  //     _position = Duration.zero;
+  //   });
+  // }
 }

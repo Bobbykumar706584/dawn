@@ -148,15 +148,15 @@ class _AudioRecorderState extends State<AudioRecorder> {
                   ),
               ],
             ),
-            if (_filePath != null && !_isRecording && _hasRecording) ...[
-              // SizedBox(height: 20),
-              // Text('Recording saved at:'),
-              // Text(_filePath!),
-              // SizedBox(height: 20),
-              PlayerWidget(
-                player: audioPlayer,
-              ),
-            ],
+            // if (_filePath != null && !_isRecording && _hasRecording) ...[
+            //   // SizedBox(height: 20),
+            //   // Text('Recording saved at:'),
+            //   // Text(_filePath!),
+            //   // SizedBox(height: 20),
+            //   PlayerWidget(
+            //     player: audioPlayer,
+            //   ),
+            // ],
           ],
         ),
       ),
