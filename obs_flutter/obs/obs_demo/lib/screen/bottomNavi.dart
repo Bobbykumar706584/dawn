@@ -113,19 +113,19 @@ class _BottomNavigationBarExampleState
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: '',
+            label: 'Profile',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: '',
+            label: 'Dashboard',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.create),
-            label: '',
+            label: 'Editor',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu),
-            label: '',
+            label: 'Menu',
           ),
         ],
         currentIndex: _selectedIndex,

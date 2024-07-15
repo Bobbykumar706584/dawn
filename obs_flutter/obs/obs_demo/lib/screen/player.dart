@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_audio_waveforms/flutter_audio_waveforms.dart';
@@ -26,8 +27,6 @@ class _PlayerWidgetState extends State<PlayerWidget> {
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerCompleteSubscription;
   StreamSubscription? _playerStateChangeSubscription;
-
-  List<double>? _samples;
 
   bool get _isPlaying => _playerState == PlayerState.playing;
 
@@ -78,25 +77,22 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        if (_duration != null && _duration!.inMilliseconds > 0)
-          PolygonWaveform(
-            maxDuration: _duration ?? Duration.zero,
-            elapsedDuration: _position ?? Duration.zero,
-            samples:
-                _samples ?? [], // Use _samples if available, else empty list
-            height: 300,
-            width: MediaQuery.of(context).size.width,
-          )
-        else
-          Container(
-            height: 100,
-            color: Colors.grey.withOpacity(0.3),
-            alignment: Alignment.center,
-            child: Text(
-              'Loading waveform...$_samples, $_duration', // Placeholder or loading indicator
-              style: TextStyle(fontSize: 16.0),
-            ),
-          ),
+        Slider(
+          onChanged: (value) {
+            final duration = _duration;
+            if (duration == null) {
+              return;
+            }
+            final position = value * duration.inMilliseconds;
+            player.seek(Duration(milliseconds: position.round()));
+          },
+          value: (_position != null &&
+                  _duration != null &&
+                  _position!.inMilliseconds > 0 &&
+                  _position!.inMilliseconds < _duration!.inMilliseconds)
+              ? _position!.inMilliseconds / _duration!.inMilliseconds
+              : 0.0,
+        ),
         Text(
           _position != null
               ? '$_positionText / $_durationText'
@@ -105,41 +101,25 @@ class _PlayerWidgetState extends State<PlayerWidget> {
                   : '',
           style: const TextStyle(fontSize: 16.0),
         ),
-        // SizedBox(height: 16),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: <Widget>[
-        //     IconButton(
-        //       icon: Icon(Icons.play_arrow),
-        //       onPressed: _isPlaying ? null : _play,
-        //     ),
-        //     IconButton(
-        //       icon: Icon(Icons.pause),
-        //       onPressed: _isPlaying ? _pause : null,
-        //     ),
-        //     IconButton(
-        //       icon: Icon(Icons.stop),
-        //       onPressed: _stop,
-        //     ),
-        //   ],
-        // ),
       ],
     );
   }
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      setState(() => _duration = duration);
+      setState(() {
+        _duration = duration;
+      });
     });
 
-    _positionSubscription = player.onPositionChanged.listen(
-      (p) => setState(() => _position = p),
-    );
+    _positionSubscription = player.onPositionChanged.listen((p) {
+      setState(() => _position = p);
+    });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
       setState(() {
         _playerState = PlayerState.stopped;
-        _position = Duration.zero;
+        _position = _duration;
       });
     });
 
@@ -151,21 +131,23 @@ class _PlayerWidgetState extends State<PlayerWidget> {
     });
   }
 
-  // Future<void> _play() async {
-  //   await player.resume();
-  //   setState(() => _playerState = PlayerState.playing);
-  // }
+  Future<void> _play() async {
+    await player.resume();
+    setState(() {
+      _playerState = PlayerState.playing;
+    });
+  }
 
-  // Future<void> _pause() async {
-  //   await player.pause();
-  //   setState(() => _playerState = PlayerState.paused);
-  // }
+  Future<void> _pause() async {
+    await player.pause();
+    setState(() => _playerState = PlayerState.paused);
+  }
 
-  // Future<void> _stop() async {
-  //   await player.stop();
-  //   setState(() {
-  //     _playerState = PlayerState.stopped;
-  //     _position = Duration.zero;
-  //   });
-  // }
+  Future<void> _stop() async {
+    await player.stop();
+    setState(() {
+      _playerState = PlayerState.stopped;
+      _position = Duration.zero;
+    });
+  }
 }

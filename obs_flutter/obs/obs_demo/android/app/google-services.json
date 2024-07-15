@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "203321438765",
+    "project_id": "obs-project-1e0cc",
+    "storage_bucket": "obs-project-1e0cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:203321438765:android:d238846a16169c16a63ea4",
+        "android_client_info": {
+          "package_name": "com.example.obs_demo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVwYCLfzs684uOdjtZcmtQkkzMPoF3JJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

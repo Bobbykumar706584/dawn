@@ -44,7 +44,6 @@ class _DashboardState extends State<Dashboard> {
       for (int i = 0; i < jsonData.length; i++) {
         textStatusList[i] = await checkJsonFileStatus(i);
       }
-
       return jsonData; // Return the modified data
     } catch (e) {
       // Handle error if the file does not exist or other errors occur
